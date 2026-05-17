@@ -11,6 +11,30 @@
 #include "World.h"
 #include "QuestHelperMgr.h"
 
+static void FulfillQuestObjectives(Player* player, Quest const* quest)
+{
+    // Set creature/GO kill counters to required values in the quest log
+    uint16 slot = player->FindQuestSlot(quest->GetQuestId());
+    if (slot < MAX_QUEST_LOG_SIZE)
+    {
+        for (uint8 i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
+            if (quest->RequiredNpcOrGoCount[i])
+                player->SetQuestSlotCounter(slot, i, quest->RequiredNpcOrGoCount[i]);
+    }
+
+    // Add any required collection items the player is missing
+    for (uint8 i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
+    {
+        uint32 itemId = quest->RequiredItemId[i];
+        if (!itemId)
+            continue;
+        uint32 needed = quest->RequiredItemCount[i];
+        uint32 have   = player->GetItemCount(itemId, true);
+        if (have < needed)
+            player->AddItem(itemId, needed - have);
+    }
+}
+
 class mod_quest_helper_player : public PlayerScript
 {
 public:
@@ -55,11 +79,15 @@ public:
 
         if (isAutoRewarded)
         {
+            FulfillQuestObjectives(player, quest);
             player->CompleteQuest(questId);
             player->RewardQuest(quest, 0, player, false);
         }
         else if (isAutoComplete)
+        {
+            FulfillQuestObjectives(player, quest);
             player->CompleteQuest(questId);
+        }
     }
 };
 
