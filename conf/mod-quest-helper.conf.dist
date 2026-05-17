@@ -1,0 +1,25 @@
+########################################
+# AzerothCore - mod-quest-helper
+########################################
+
+[worldserver]
+
+###############################################################################
+# QUEST HELPER MODULE SETTINGS
+###############################################################################
+#
+#    QuestHelper.Enable
+#        Description: Enable or disable the Quest Helper module.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+QuestHelper.Enable = 0
+
+#    QuestHelper.WelcomeMessage.Enable
+#        Description: Show a welcome message to players on login explaining
+#                     that Quest Helper is active and how to disable notices.
+#                     Only applies when QuestHelper.Enable = 1.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+QuestHelper.WelcomeMessage.Enable = 1
