@@ -38,35 +38,28 @@ public:
         LOG_DEBUG("module.quest_helper", "QuestHelper: Player {} accepted quest {} ({})",
             player->GetName(), quest->GetTitle(), questId);
 
-        if (player->GetPlayerSetting(QUEST_HELPER_MODULE, SETTING_QH_FLAGS).HasFlag(QH_FLAG_HIDE_MESSAGES))
-            return;
+        bool isAutoRewarded = sQuestHelperMgr->IsAutoRewarded(questId, realmId);
+        bool isAutoComplete = sQuestHelperMgr->IsAutoComplete(questId, realmId);
 
-        ChatHandler handler(player->GetSession());
-        if (sQuestHelperMgr->IsAutoRewarded(questId, realmId))
-            handler.PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_AUTO_COMPLETE_REWARD, quest->GetTitle());
-        else if (sQuestHelperMgr->IsAutoComplete(questId, realmId))
-            handler.PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_AUTO_COMPLETE, quest->GetTitle());
+        if (!player->GetPlayerSetting(QUEST_HELPER_MODULE, SETTING_QH_FLAGS).HasFlag(QH_FLAG_HIDE_MESSAGES))
+        {
+            ChatHandler handler(player->GetSession());
+            if (isAutoRewarded)
+                handler.PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_AUTO_COMPLETE_REWARD, quest->GetTitle());
+            else if (isAutoComplete)
+                handler.PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_AUTO_COMPLETE, quest->GetTitle());
 
-        for (std::string const& comment : sQuestHelperMgr->GetEnabledComments(questId, realmId))
-            handler.PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_COMMENT, comment);
-    }
+            for (std::string const& comment : sQuestHelperMgr->GetEnabledComments(questId, realmId))
+                handler.PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_COMMENT, comment);
+        }
 
-    void OnPlayerCompleteQuest(Player* player, Quest const* quest) override
-    {
-        if (!sQuestHelperMgr->IsEnabled())
-            return;
-
-        LOG_DEBUG("module.quest_helper", "QuestHelper: Player {} completed quest {} ({})",
-            player->GetName(), quest->GetTitle(), quest->GetQuestId());
-    }
-
-    void OnPlayerQuestAbandon(Player* player, uint32 questId) override
-    {
-        if (!sQuestHelperMgr->IsEnabled())
-            return;
-
-        LOG_DEBUG("module.quest_helper", "QuestHelper: Player {} abandoned quest {}",
-            player->GetName(), questId);
+        if (isAutoRewarded)
+        {
+            player->CompleteQuest(questId);
+            player->RewardQuest(quest, 0, player, false);
+        }
+        else if (isAutoComplete)
+            player->CompleteQuest(questId);
     }
 };
 

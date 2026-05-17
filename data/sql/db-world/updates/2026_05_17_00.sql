@@ -6,8 +6,8 @@ DELETE FROM `module_string_locale` WHERE `module` = 'mod-quest-helper';
 
 INSERT INTO `module_string` (`module`, `id`, `string`) VALUES
 -- Player notifications (coloured green)
-('mod-quest-helper',  1, '|cff4CFF00We are aware of issues with the quest "{}". It will be automatically completed.|r'),
-('mod-quest-helper',  2, '|cff4CFF00We are aware of issues with the quest "{}". It will be automatically completed and rewarded.|r'),
+('mod-quest-helper',  1, '|cff4CFF00Time travellers, we are aware of issues affecting ''{}''. The quest will complete automatically while we work on a fix.|r'),
+('mod-quest-helper',  2, '|cff4CFF00Time travellers, we are aware of issues affecting ''{}''. The quest will complete and rewards will be granted automatically while we work on a fix.|r'),
 ('mod-quest-helper',  3, '|cff4CFF00[Quest Helper] This server automatically notifies you when you accept a quest with a known issue, so you are never left in the dark. Type .qh off to disable these messages.|r'),
 -- Quest-accept comment (coloured blue)
 ('mod-quest-helper', 11, '|cff00BFFF[Quest Note] {}|r'),
