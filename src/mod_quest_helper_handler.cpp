@@ -27,7 +27,7 @@ void QuestHelperMgr::PurgeUntilRestartFlags()
         return;
 
     LoginDatabase.DirectExecute(
-        "DELETE FROM `quest_completer_quests` WHERE (`flag` & {}) != 0", QUEST_AUTO_FLAG_UNTIL_RESTART);
+        "DELETE FROM `quest_completer_quests` WHERE (`flag` & {}) != 0", uint32(QUEST_AUTO_FLAG_UNTIL_RESTART));
     LOG_INFO("module", "Quest Helper: purged until-restart flags.");
 }
 
@@ -73,7 +73,7 @@ void QuestHelperMgr::AddAutoCompleteQuest(uint32 questId, uint8 flag, uint32 rea
     LoginDatabase.EscapeString(escapedReason);
     LoginDatabase.Execute(
         "REPLACE INTO `quest_completer_quests` (`questId`, `flag`, `realmId`, `reason`) VALUES ({}, {}, {}, '{}')",
-        questId, flag, realmId, escapedReason);
+        questId, uint32(flag), realmId, escapedReason);
 }
 
 bool QuestHelperMgr::RemoveAutoCompleteQuest(uint32 questId, uint32 realmId)

@@ -123,7 +123,7 @@ public:
         sQuestHelperMgr->AddAutoCompleteQuest(questId, flag, targetRealm, std::string(reason));
 
         handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_CMD_QUEST_ADDED,
-            questId, quest->GetTitle(), flag, targetRealm);
+            questId, quest->GetTitle(), uint32(flag), targetRealm);
         return true;
     }
 
@@ -148,7 +148,7 @@ public:
         sQuestHelperMgr->AddAutoCompleteQuest(questId, flag | QUEST_AUTO_FLAG_UNTIL_RESTART, targetRealm, std::string(reason));
 
         handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_CMD_QUEST_ADDED_TEMP,
-            questId, quest->GetTitle(), flag, targetRealm);
+            questId, quest->GetTitle(), uint32(flag), targetRealm);
         return true;
     }
 

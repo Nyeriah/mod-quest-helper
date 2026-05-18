@@ -81,7 +81,7 @@ public:
         {
             FulfillQuestObjectives(player, quest);
             player->CompleteQuest(questId);
-            player->RewardQuest(quest, 0, player, false);
+            player->RewardQuest(quest, 0, nullptr, false);
         }
         else if (isAutoComplete)
         {
