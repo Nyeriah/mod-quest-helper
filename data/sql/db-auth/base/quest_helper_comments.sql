@@ -8,7 +8,7 @@
 CREATE TABLE IF NOT EXISTS `quest_helper_comments` (
   `id`      int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique comment ID',
   `questId` int unsigned NOT NULL COMMENT 'Quest template ID',
-  `realmId` int unsigned NOT NULL COMMENT 'Realm ID from realmlist.id',
+  `realmId` int NOT NULL COMMENT 'Realm ID from realmlist.id; -1 = all realms',
   `comment` varchar(500) NOT NULL COMMENT 'Message displayed to the player on quest accept',
   `enabled` tinyint unsigned NOT NULL DEFAULT '1' COMMENT '1=active, 0=hidden',
   PRIMARY KEY (`id`),

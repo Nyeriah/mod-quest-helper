@@ -63,7 +63,7 @@ public:
         return true;
     }
 
-    static bool HandleQuestHelperInfoCommand(ChatHandler* handler, uint32 questId, Optional<uint32> realmId)
+    static bool HandleQuestHelperInfoCommand(ChatHandler* handler, uint32 questId, Optional<int32> realmId)
     {
         Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
         if (!quest)
@@ -73,22 +73,24 @@ public:
             return false;
         }
 
-        uint32 targetRealm = realmId.value_or(realm.Id.Realm);
+        uint32 targetRealm = realmId.has_value() ? static_cast<uint32>(realmId.value()) : realm.Id.Realm;
         QuestEntry const* entry = sQuestHelperMgr->GetQuestEntry(questId, targetRealm);
+
+        int32 displayRealm = static_cast<int32>(targetRealm);
 
         if (!entry)
         {
             handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_INFO_NOT_FLAGGED,
-                questId, quest->GetTitle(), targetRealm);
+                questId, quest->GetTitle(), displayRealm);
             return true;
         }
 
         if (entry->flag == QUEST_AUTO_FLAG_COMPLETE_REWARD)
             handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_INFO_AUTO_COMPLETE_REWARD,
-                questId, quest->GetTitle(), targetRealm);
+                questId, quest->GetTitle(), displayRealm);
         else
             handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_INFO_AUTO_COMPLETE,
-                questId, quest->GetTitle(), targetRealm);
+                questId, quest->GetTitle(), displayRealm);
 
         if (entry->flag & QUEST_AUTO_FLAG_UNTIL_RESTART)
             handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_INFO_TEMP);
@@ -102,7 +104,7 @@ public:
         return true;
     }
 
-    static bool HandleQuestHelperAddCommand(ChatHandler* handler, uint32 questId, uint8 flag, Optional<uint32> realmId, Tail reason)
+    static bool HandleQuestHelperAddCommand(ChatHandler* handler, uint32 questId, uint8 flag, Optional<int32> realmId, Tail reason)
     {
         Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
         if (!quest)
@@ -119,15 +121,15 @@ public:
             return false;
         }
 
-        uint32 targetRealm = realmId.value_or(realm.Id.Realm);
+        uint32 targetRealm = realmId.has_value() ? static_cast<uint32>(realmId.value()) : realm.Id.Realm;
         sQuestHelperMgr->AddAutoCompleteQuest(questId, flag, targetRealm, std::string(reason));
 
         handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_CMD_QUEST_ADDED,
-            questId, quest->GetTitle(), uint32(flag), targetRealm);
+            questId, quest->GetTitle(), uint32(flag), static_cast<int32>(targetRealm));
         return true;
     }
 
-    static bool HandleQuestHelperAddTempCommand(ChatHandler* handler, uint32 questId, uint8 flag, Optional<uint32> realmId, Tail reason)
+    static bool HandleQuestHelperAddTempCommand(ChatHandler* handler, uint32 questId, uint8 flag, Optional<int32> realmId, Tail reason)
     {
         Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
         if (!quest)
@@ -144,28 +146,28 @@ public:
             return false;
         }
 
-        uint32 targetRealm = realmId.value_or(realm.Id.Realm);
+        uint32 targetRealm = realmId.has_value() ? static_cast<uint32>(realmId.value()) : realm.Id.Realm;
         sQuestHelperMgr->AddAutoCompleteQuest(questId, flag | QUEST_AUTO_FLAG_UNTIL_RESTART, targetRealm, std::string(reason));
 
         handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_CMD_QUEST_ADDED_TEMP,
-            questId, quest->GetTitle(), uint32(flag), targetRealm);
+            questId, quest->GetTitle(), uint32(flag), static_cast<int32>(targetRealm));
         return true;
     }
 
-    static bool HandleQuestHelperRemoveCommand(ChatHandler* handler, uint32 questId, Optional<uint32> realmId)
+    static bool HandleQuestHelperRemoveCommand(ChatHandler* handler, uint32 questId, Optional<int32> realmId)
     {
-        uint32 targetRealm = realmId.value_or(realm.Id.Realm);
+        uint32 targetRealm = realmId.has_value() ? static_cast<uint32>(realmId.value()) : realm.Id.Realm;
 
         if (!sQuestHelperMgr->RemoveAutoCompleteQuest(questId, targetRealm))
         {
-            handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_CMD_QUEST_NOT_REGISTERED, questId, targetRealm);
+            handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_CMD_QUEST_NOT_REGISTERED, questId, static_cast<int32>(targetRealm));
             handler->SetSentErrorMessage(true);
             return false;
         }
 
         Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
         std::string const title = quest ? quest->GetTitle() : std::to_string(questId);
-        handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_CMD_QUEST_REMOVED, questId, title, targetRealm);
+        handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_CMD_QUEST_REMOVED, questId, title, static_cast<int32>(targetRealm));
         return true;
     }
 
@@ -178,7 +180,7 @@ public:
         return true;
     }
 
-    static bool HandleQuestHelperCommentAddCommand(ChatHandler* handler, uint32 questId, Optional<uint32> realmId, Tail comment)
+    static bool HandleQuestHelperCommentAddCommand(ChatHandler* handler, uint32 questId, Optional<int32> realmId, Tail comment)
     {
         Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
         if (!quest)
@@ -191,11 +193,11 @@ public:
         if (comment.empty())
             return false;
 
-        uint32 targetRealm = realmId.value_or(realm.Id.Realm);
+        uint32 targetRealm = realmId.has_value() ? static_cast<uint32>(realmId.value()) : realm.Id.Realm;
         uint32 commentId = sQuestHelperMgr->AddQuestComment(questId, targetRealm, std::string(comment));
 
         handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_CMD_COMMENT_ADDED,
-            commentId, questId, quest->GetTitle(), targetRealm);
+            commentId, questId, quest->GetTitle(), static_cast<int32>(targetRealm));
         return true;
     }
 

@@ -10,7 +10,9 @@
 #include <unordered_map>
 #include <vector>
 
-static constexpr char QUEST_HELPER_MODULE[] = "mod-quest-helper";
+static constexpr char     QUEST_HELPER_MODULE[] = "mod-quest-helper";
+// Sentinel realmId stored as -1 in the DB; matches every realm during lookup.
+static constexpr uint32   REALM_ID_ALL          = 0xFFFFFFFF;
 
 enum QuestHelperStrings : uint32
 {

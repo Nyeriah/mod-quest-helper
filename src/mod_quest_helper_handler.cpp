@@ -55,7 +55,7 @@ void QuestHelperMgr::LoadAutoCompleteQuests()
 
         uint32 questId     = fields[0].Get<uint32>();
         uint8  flag        = fields[1].Get<uint8>();
-        uint32 realmId     = fields[2].Get<uint32>();
+        uint32 realmId     = static_cast<uint32>(fields[2].Get<int32>());
         std::string reason = fields[3].Get<std::string>();
 
         _autoCompleteQuests[MakeKey(questId, realmId)] = { flag, std::move(reason) };
@@ -114,7 +114,7 @@ void QuestHelperMgr::LoadQuestComments()
 
         uint32 id        = fields[0].Get<uint32>();
         uint32 questId   = fields[1].Get<uint32>();
-        uint32 realmId   = fields[2].Get<uint32>();
+        uint32 realmId   = static_cast<uint32>(fields[2].Get<int32>());
         std::string text = fields[3].Get<std::string>();
         bool enabled     = fields[4].Get<bool>();
 
@@ -187,13 +187,21 @@ bool QuestHelperMgr::HideQuestComment(uint32 commentId)
 std::vector<std::string> QuestHelperMgr::GetEnabledComments(uint32 questId, uint32 realmId) const
 {
     std::vector<std::string> out;
-    auto itr = _questComments.find(MakeKey(questId, realmId));
-    if (itr == _questComments.end())
-        return out;
 
-    for (QuestComment const& c : itr->second)
-        if (c.enabled)
-            out.push_back(c.text);
+    auto collect = [&](uint64 key)
+    {
+        auto itr = _questComments.find(key);
+        if (itr == _questComments.end())
+            return;
+        for (QuestComment const& c : itr->second)
+            if (c.enabled)
+                out.push_back(c.text);
+    };
+
+    // Realm-specific comments first, then all-realms comments.
+    collect(MakeKey(questId, realmId));
+    if (realmId != REALM_ID_ALL)
+        collect(MakeKey(questId, REALM_ID_ALL));
 
     return out;
 }
@@ -201,7 +209,18 @@ std::vector<std::string> QuestHelperMgr::GetEnabledComments(uint32 questId, uint
 QuestEntry const* QuestHelperMgr::GetQuestEntry(uint32 questId, uint32 realmId) const
 {
     auto itr = _autoCompleteQuests.find(MakeKey(questId, realmId));
-    return itr != _autoCompleteQuests.end() ? &itr->second : nullptr;
+    if (itr != _autoCompleteQuests.end())
+        return &itr->second;
+
+    // Fall back to the all-realms entry if no realm-specific entry exists.
+    if (realmId != REALM_ID_ALL)
+    {
+        itr = _autoCompleteQuests.find(MakeKey(questId, REALM_ID_ALL));
+        if (itr != _autoCompleteQuests.end())
+            return &itr->second;
+    }
+
+    return nullptr;
 }
 
 uint8 QuestHelperMgr::GetFlag(uint32 questId, uint32 realmId) const
