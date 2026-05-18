@@ -254,7 +254,7 @@ DELETE FROM `command` WHERE `name` IN (
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
 ('qh',                0, 'Syntax: .qh $subcommand\n\nQuest Helper module commands. Use .qh help to toggle notifications.'),
 ('qh help',           0, 'Syntax: .qh help [on|off]\n\nToggles Quest Helper notifications on or off. If no argument is given the state is toggled.'),
-('qh info',           0, 'Syntax: .qh info $questId [$realmId]\n\nShows the Quest Helper status for a quest: auto-complete flag, whether it is temporary, reason, and any active notes. realmId defaults to the current realm.'),
+('qh info',           1, 'Syntax: .qh info $questId [$realmId]\n\nShows the Quest Helper status for a quest: auto-complete flag, whether it is temporary, reason, and any active notes. realmId defaults to the current realm.'),
 ('qh add',            1, 'Syntax: .qh add $questId $flag [$realmId] [$reason]\n\nRegisters a quest for auto-completion. Flag: 1 = complete only, 2 = complete and reward. realmId defaults to the current realm.'),
 ('qh addtemp',        1, 'Syntax: .qh addtemp $questId $flag [$realmId] [$reason]\n\nRegisters a quest for auto-completion until the next server restart, then the entry is automatically deleted. Flag: 1 = complete only, 2 = complete and reward. realmId defaults to the current realm.'),
 ('qh remove',         1, 'Syntax: .qh remove $questId [$realmId]\n\nUnregisters a quest from auto-completion. realmId defaults to the current realm.'),

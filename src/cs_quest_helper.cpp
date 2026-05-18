@@ -29,7 +29,7 @@ public:
         static ChatCommandTable qhTable =
         {
             { "help",    HandleQuestHelperHelpCommand,    SEC_PLAYER,    Console::No  },
-            { "info",    HandleQuestHelperInfoCommand,    SEC_PLAYER,    Console::No  },
+            { "info",    HandleQuestHelperInfoCommand,    SEC_MODERATOR, Console::Yes },
             { "add",     HandleQuestHelperAddCommand,     SEC_MODERATOR, Console::Yes },
             { "addtemp", HandleQuestHelperAddTempCommand, SEC_MODERATOR, Console::Yes },
             { "remove",  HandleQuestHelperRemoveCommand,  SEC_MODERATOR, Console::Yes },
