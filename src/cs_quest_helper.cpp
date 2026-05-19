@@ -104,7 +104,7 @@ public:
         return true;
     }
 
-    static bool HandleQuestHelperAddCommand(ChatHandler* handler, uint32 questId, uint8 flag, Optional<int32> realmId, Tail reason)
+    static bool HandleQuestHelperAddCommand(ChatHandler* handler, uint32 questId, Optional<uint8> flag, Optional<int32> realmId, Tail reason)
     {
         Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
         if (!quest)
@@ -114,7 +114,8 @@ public:
             return false;
         }
 
-        if (flag != QUEST_AUTO_FLAG_COMPLETE && flag != QUEST_AUTO_FLAG_COMPLETE_REWARD)
+        uint8 resolvedFlag = flag.value_or(QUEST_AUTO_FLAG_COMPLETE);
+        if (resolvedFlag != QUEST_AUTO_FLAG_COMPLETE && resolvedFlag != QUEST_AUTO_FLAG_COMPLETE_REWARD)
         {
             handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_CMD_INVALID_FLAG);
             handler->SetSentErrorMessage(true);
@@ -122,14 +123,14 @@ public:
         }
 
         uint32 targetRealm = realmId.has_value() ? static_cast<uint32>(realmId.value()) : realm.Id.Realm;
-        sQuestHelperMgr->AddAutoCompleteQuest(questId, flag, targetRealm, std::string(reason));
+        sQuestHelperMgr->AddAutoCompleteQuest(questId, resolvedFlag, targetRealm, std::string(reason));
 
         handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_CMD_QUEST_ADDED,
-            questId, quest->GetTitle(), uint32(flag), static_cast<int32>(targetRealm));
+            questId, quest->GetTitle(), uint32(resolvedFlag), static_cast<int32>(targetRealm));
         return true;
     }
 
-    static bool HandleQuestHelperAddTempCommand(ChatHandler* handler, uint32 questId, uint8 flag, Optional<int32> realmId, Tail reason)
+    static bool HandleQuestHelperAddTempCommand(ChatHandler* handler, uint32 questId, Optional<uint8> flag, Optional<int32> realmId, Tail reason)
     {
         Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
         if (!quest)
@@ -139,7 +140,8 @@ public:
             return false;
         }
 
-        if (flag != QUEST_AUTO_FLAG_COMPLETE && flag != QUEST_AUTO_FLAG_COMPLETE_REWARD)
+        uint8 resolvedFlag = flag.value_or(QUEST_AUTO_FLAG_COMPLETE);
+        if (resolvedFlag != QUEST_AUTO_FLAG_COMPLETE && resolvedFlag != QUEST_AUTO_FLAG_COMPLETE_REWARD)
         {
             handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_CMD_INVALID_FLAG);
             handler->SetSentErrorMessage(true);
@@ -147,10 +149,10 @@ public:
         }
 
         uint32 targetRealm = realmId.has_value() ? static_cast<uint32>(realmId.value()) : realm.Id.Realm;
-        sQuestHelperMgr->AddAutoCompleteQuest(questId, flag | QUEST_AUTO_FLAG_UNTIL_RESTART, targetRealm, std::string(reason));
+        sQuestHelperMgr->AddAutoCompleteQuest(questId, resolvedFlag | QUEST_AUTO_FLAG_UNTIL_RESTART, targetRealm, std::string(reason));
 
         handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_CMD_QUEST_ADDED_TEMP,
-            questId, quest->GetTitle(), uint32(flag), static_cast<int32>(targetRealm));
+            questId, quest->GetTitle(), uint32(resolvedFlag), static_cast<int32>(targetRealm));
         return true;
     }
 
