@@ -38,6 +38,8 @@ enum QuestHelperStrings : uint32
     LANG_QUEST_HELPER_INFO_REASON               = 21,
     // .qh addtemp GM confirmation
     LANG_QUEST_HELPER_CMD_QUEST_ADDED_TEMP      = 22,
+    LANG_QUEST_HELPER_CMD_QUEST_ALREADY_REGISTERED = 23,
+    LANG_QUEST_HELPER_CMD_QUEST_FLAG_UPDATED       = 24,
 };
 
 enum QuestHelperSettingIndex : uint8

@@ -3,7 +3,6 @@
  */
 
 #include "Chat.h"
-#include "ObjectMgr.h"
 #include "Player.h"
 #include "PlayerSettings.h"
 #include "Realm.h"
@@ -63,16 +62,9 @@ public:
         return true;
     }
 
-    static bool HandleQuestHelperInfoCommand(ChatHandler* handler, uint32 questId, Optional<int32> realmId)
+    static bool HandleQuestHelperInfoCommand(ChatHandler* handler, Quest const* quest, Optional<int32> realmId)
     {
-        Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
-        if (!quest)
-        {
-            handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_CMD_QUEST_NOT_FOUND, questId);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
+        uint32 questId = quest->GetQuestId();
         int32 targetRealm = realmId.value_or(static_cast<int32>(realm.Id.Realm));
         QuestEntry const* entry = sQuestHelperMgr->GetQuestEntry(questId, targetRealm);
 
@@ -102,16 +94,8 @@ public:
         return true;
     }
 
-    static bool HandleQuestHelperAddCommand(ChatHandler* handler, uint32 questId, uint8 flag, Optional<int32> realmId, Tail reason)
+    static bool HandleQuestHelperAddCommand(ChatHandler* handler, Quest const* quest, uint8 flag, Optional<int32> realmId, Tail reason)
     {
-        Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
-        if (!quest)
-        {
-            handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_CMD_QUEST_NOT_FOUND, questId);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
         if (flag != QUEST_AUTO_FLAG_COMPLETE && flag != QUEST_AUTO_FLAG_COMPLETE_REWARD)
         {
             handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_CMD_INVALID_FLAG);
@@ -119,24 +103,34 @@ public:
             return false;
         }
 
+        uint32 questId    = quest->GetQuestId();
         int32 targetRealm = realmId.value_or(static_cast<int32>(realm.Id.Realm));
-        sQuestHelperMgr->AddAutoCompleteQuest(questId, flag, targetRealm, std::string(reason));
 
+        QuestEntry const* existing = sQuestHelperMgr->GetQuestEntry(questId, targetRealm);
+        if (existing)
+        {
+            if (existing->flag == flag)
+            {
+                handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_CMD_QUEST_ALREADY_REGISTERED,
+                    questId, quest->GetTitle(), targetRealm, uint32(flag));
+                return true;
+            }
+
+            uint8 oldFlag = existing->flag;
+            sQuestHelperMgr->AddAutoCompleteQuest(questId, flag, targetRealm, std::string(reason));
+            handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_CMD_QUEST_FLAG_UPDATED,
+                questId, quest->GetTitle(), targetRealm, uint32(oldFlag), uint32(flag));
+            return true;
+        }
+
+        sQuestHelperMgr->AddAutoCompleteQuest(questId, flag, targetRealm, std::string(reason));
         handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_CMD_QUEST_ADDED,
             questId, quest->GetTitle(), uint32(flag), targetRealm);
         return true;
     }
 
-    static bool HandleQuestHelperAddTempCommand(ChatHandler* handler, uint32 questId, uint8 flag, Optional<int32> realmId, Tail reason)
+    static bool HandleQuestHelperAddTempCommand(ChatHandler* handler, Quest const* quest, uint8 flag, Optional<int32> realmId, Tail reason)
     {
-        Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
-        if (!quest)
-        {
-            handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_CMD_QUEST_NOT_FOUND, questId);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
         if (flag != QUEST_AUTO_FLAG_COMPLETE && flag != QUEST_AUTO_FLAG_COMPLETE_REWARD)
         {
             handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_CMD_INVALID_FLAG);
@@ -144,28 +138,51 @@ public:
             return false;
         }
 
-        int32 targetRealm = realmId.value_or(static_cast<int32>(realm.Id.Realm));
-        sQuestHelperMgr->AddAutoCompleteQuest(questId, flag | QUEST_AUTO_FLAG_UNTIL_RESTART, targetRealm, std::string(reason));
+        uint32 questId      = quest->GetQuestId();
+        int32 targetRealm   = realmId.value_or(static_cast<int32>(realm.Id.Realm));
+        uint8 newFlag       = flag | QUEST_AUTO_FLAG_UNTIL_RESTART;
 
+        QuestEntry const* existing = sQuestHelperMgr->GetQuestEntry(questId, targetRealm);
+        if (existing)
+        {
+            if (existing->flag == newFlag)
+            {
+                handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_CMD_QUEST_ALREADY_REGISTERED,
+                    questId, quest->GetTitle(), targetRealm, uint32(flag));
+                return true;
+            }
+
+            uint8 oldFlag = existing->flag;
+            sQuestHelperMgr->AddAutoCompleteQuest(questId, newFlag, targetRealm, std::string(reason));
+            handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_CMD_QUEST_FLAG_UPDATED,
+                questId, quest->GetTitle(), targetRealm, uint32(oldFlag), uint32(flag));
+            return true;
+        }
+
+        sQuestHelperMgr->AddAutoCompleteQuest(questId, newFlag, targetRealm, std::string(reason));
         handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_CMD_QUEST_ADDED_TEMP,
             questId, quest->GetTitle(), uint32(flag), targetRealm);
         return true;
     }
 
-    static bool HandleQuestHelperRemoveCommand(ChatHandler* handler, uint32 questId, Optional<int32> realmId)
+    static bool HandleQuestHelperRemoveCommand(ChatHandler* handler, Quest const* quest, Optional<int32> realmId)
     {
+        uint32 questId    = quest->GetQuestId();
         int32 targetRealm = realmId.value_or(static_cast<int32>(realm.Id.Realm));
 
-        if (!sQuestHelperMgr->RemoveAutoCompleteQuest(questId, targetRealm))
+        QuestEntry const* entry = sQuestHelperMgr->GetQuestEntry(questId, targetRealm);
+        if (!entry)
         {
-            handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_CMD_QUEST_NOT_REGISTERED, questId, targetRealm);
+            handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_CMD_QUEST_NOT_REGISTERED,
+                questId, quest->GetTitle(), targetRealm);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
-        std::string const title = quest ? quest->GetTitle() : std::to_string(questId);
-        handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_CMD_QUEST_REMOVED, questId, title, targetRealm);
+        uint8 removedFlag = entry->flag;
+        sQuestHelperMgr->RemoveAutoCompleteQuest(questId, targetRealm);
+        handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_CMD_QUEST_REMOVED,
+            questId, quest->GetTitle(), uint32(removedFlag), targetRealm);
         return true;
     }
 
@@ -178,19 +195,12 @@ public:
         return true;
     }
 
-    static bool HandleQuestHelperCommentAddCommand(ChatHandler* handler, uint32 questId, Optional<int32> realmId, Tail comment)
+    static bool HandleQuestHelperCommentAddCommand(ChatHandler* handler, Quest const* quest, Optional<int32> realmId, Tail comment)
     {
-        Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
-        if (!quest)
-        {
-            handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_CMD_QUEST_NOT_FOUND, questId);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
         if (comment.empty())
             return false;
 
+        uint32 questId    = quest->GetQuestId();
         int32 targetRealm = realmId.value_or(static_cast<int32>(realm.Id.Realm));
         uint32 commentId = sQuestHelperMgr->AddQuestComment(questId, targetRealm, std::string(comment));
 
