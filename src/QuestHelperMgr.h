@@ -8,6 +8,7 @@
 #include "Define.h"
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 static constexpr char QUEST_HELPER_MODULE[] = "mod-quest-helper";
@@ -42,6 +43,11 @@ enum QuestHelperStrings : uint32
     LANG_QUEST_HELPER_CMD_QUEST_FLAG_UPDATED       = 24,
     // .qh check output
     LANG_QUEST_HELPER_CHECK_NO_ISSUES              = 25,
+    // .qh list output
+    LANG_QUEST_HELPER_LIST_HEADER                  = 26,
+    LANG_QUEST_HELPER_LIST_ZONE                    = 27,
+    LANG_QUEST_HELPER_LIST_QUEST                   = 28,
+    LANG_QUEST_HELPER_LIST_EMPTY                   = 29,
 };
 
 enum QuestHelperSettingIndex : uint8
@@ -106,6 +112,9 @@ public:
 
     bool IsAutoComplete(uint32 questId, int32 realmId) const;
     bool IsAutoRewarded(uint32 questId, int32 realmId) const;
+
+    // Returns all {questId, entry} pairs registered for the resolved realm.
+    std::vector<std::pair<uint32, QuestEntry>> GetQuestEntriesForRealm(int32 realmId) const;
 
 private:
     static uint64 MakeKey(uint32 questId, uint32 realmId)

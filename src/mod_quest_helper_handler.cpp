@@ -221,3 +221,13 @@ bool QuestHelperMgr::IsAutoRewarded(uint32 questId, int32 realmId) const
 {
     return GetFlag(questId, realmId) == QUEST_AUTO_FLAG_COMPLETE_REWARD;
 }
+
+std::vector<std::pair<uint32, QuestEntry>> QuestHelperMgr::GetQuestEntriesForRealm(int32 realmId) const
+{
+    uint32 target = ResolveRealm(realmId);
+    std::vector<std::pair<uint32, QuestEntry>> out;
+    for (auto const& [key, entry] : _autoCompleteQuests)
+        if (static_cast<uint32>(key >> 32) == target)
+            out.emplace_back(static_cast<uint32>(key & 0xFFFFFFFFULL), entry);
+    return out;
+}

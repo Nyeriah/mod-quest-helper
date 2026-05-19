@@ -41,7 +41,12 @@ INSERT INTO `module_string` (`module`, `id`, `string`) VALUES
 -- .qh addtemp: GM confirmation
 ('mod-quest-helper', 22, 'Quest {} ("{}", flag {}) added for realm {} (expires on next restart).'),
 -- .qh check: no known issues
-('mod-quest-helper', 25, '|cff4CFF00Quest "{}" has no known issues on this realm.|r');
+('mod-quest-helper', 25, '|cff4CFF00Quest "{}" has no known issues on this realm.|r'),
+-- .qh list output
+('mod-quest-helper', 26, 'Quest Helper: {} quest(s) on realm {}:'),
+('mod-quest-helper', 27, '  [{}]'),
+('mod-quest-helper', 28, '    #{} "{}" [flag {}]'),
+('mod-quest-helper', 29, 'No auto-complete quests on realm {}.');
 
 INSERT INTO `module_string_locale` (`module`, `id`, `locale`, `string`) VALUES
 -- koKR
@@ -269,12 +274,35 @@ INSERT INTO `module_string_locale` (`module`, `id`, `locale`, `string`) VALUES
 ('mod-quest-helper', 25, 'esMX', '|cff4CFF00La misión "{}" no tiene problemas conocidos en este reino.|r');
 
 -- ============================================================
+-- Strings 26-29 locales (.qh list)
+-- ============================================================
+
+INSERT INTO `module_string_locale` (`module`, `id`, `locale`, `string`) VALUES
+('mod-quest-helper', 26, 'koKR', '퀘스트 도우미: 렐름 {} 자동 완료 퀘스트 {}개:'),
+('mod-quest-helper', 29, 'koKR', '렐름 {}에 등록된 자동 완료 퀘스트가 없습니다.'),
+('mod-quest-helper', 26, 'frFR', 'Assistant de Quête : {} quête(s) sur le royaume {} :'),
+('mod-quest-helper', 29, 'frFR', 'Aucune quête à complétion automatique sur le royaume {}.'),
+('mod-quest-helper', 26, 'deDE', 'Quest-Helfer: {} Quest(s) auf Realm {}:'),
+('mod-quest-helper', 29, 'deDE', 'Keine Auto-Abschluss-Quests auf Realm {} registriert.'),
+('mod-quest-helper', 26, 'zhCN', '任务助手：领域 {} 上共 {} 个自动完成任务：'),
+('mod-quest-helper', 29, 'zhCN', '领域 {} 上没有已注册的自动完成任务。'),
+('mod-quest-helper', 26, 'zhTW', '任務助手：領域 {} 上共 {} 個自動完成任務：'),
+('mod-quest-helper', 29, 'zhTW', '領域 {} 上沒有已註冊的自動完成任務。'),
+('mod-quest-helper', 26, 'esES', 'Asistente de Misiones: {} misión/misiones en el reino {}:'),
+('mod-quest-helper', 29, 'esES', 'No hay misiones de auto-completar en el reino {}.'),
+('mod-quest-helper', 26, 'esMX', 'Asistente de Misiones: {} misión/misiones en el reino {}:'),
+('mod-quest-helper', 29, 'esMX', 'No hay misiones de auto-completar en el reino {}.'),
+('mod-quest-helper', 26, 'ruRU', 'Помощник заданий: {} задание(й) на реалме {}:'),
+('mod-quest-helper', 29, 'ruRU', 'На реалме {} нет зарегистрированных заданий для авто-выполнения.');
+
+-- ============================================================
 -- Command table
 -- ============================================================
 
 DELETE FROM `command` WHERE `name` IN (
     'qh',
     'qh check',
+    'qh list',
     'qh messages',
     'qh info',
     'qh add',
@@ -290,6 +318,7 @@ DELETE FROM `command` WHERE `name` IN (
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
 ('qh',                0, 'Syntax: .qh $subcommand\n\nQuest Helper module commands. Use .qh messages to toggle notifications.'),
 ('qh check',          0, 'Syntax: .qh check $quest\n\nRuns Quest Helper checks for a quest: applies auto-completion or reward if the quest is flagged, shows any GM notes, and reports no known issues otherwise. $quest accepts a quest ID or shift-clicked quest link.'),
+('qh list',           1, 'Syntax: .qh list\n\nLists all auto-complete quests registered on the current realm, grouped by zone.'),
 ('qh messages',       0, 'Syntax: .qh messages [on|off]\n\nToggles Quest Helper notifications on or off. If no argument is given the state is toggled.'),
 ('qh info',           1, 'Syntax: .qh info $quest [$realmId]\n\nShows the Quest Helper status for a quest: auto-complete flag, whether it is temporary, reason, and any active notes. $quest accepts a quest ID or shift-clicked quest link. realmId defaults to the current realm; use -1 for all realms.'),
 ('qh add',            1, 'Syntax: .qh add $quest $flag [$realmId] [$reason]\n\nRegisters a quest for auto-completion. $quest accepts a quest ID or shift-clicked quest link. Flag: 1 = complete only, 2 = complete and reward. realmId defaults to the current realm; use -1 for all realms. If the quest is already registered with a different flag, the flag is updated.'),

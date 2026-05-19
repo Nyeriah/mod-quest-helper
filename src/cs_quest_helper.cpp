@@ -3,12 +3,16 @@
  */
 
 #include "Chat.h"
+#include "DBCStores.h"
+#include "ObjectMgr.h"
 #include "Player.h"
 #include "PlayerSettings.h"
 #include "Realm.h"
 #include "ScriptMgr.h"
 #include "World.h"
 #include "QuestHelperMgr.h"
+#include <algorithm>
+#include <map>
 
 using namespace Acore::ChatCommands;
 
@@ -49,6 +53,7 @@ public:
         {
             { "check",    HandleQuestHelperCheckCommand,    SEC_PLAYER,    Console::No  },
             { "messages", HandleQuestHelperMessagesCommand, SEC_PLAYER,    Console::No  },
+            { "list",    HandleQuestHelperListCommand,    SEC_MODERATOR, Console::Yes },
             { "info",    HandleQuestHelperInfoCommand,    SEC_MODERATOR, Console::Yes },
             { "add",     HandleQuestHelperAddCommand,     SEC_MODERATOR, Console::Yes },
             { "addtemp", HandleQuestHelperAddTempCommand, SEC_MODERATOR, Console::Yes },
@@ -119,6 +124,61 @@ public:
 
         handler->PSendModuleSysMessage(QUEST_HELPER_MODULE,
             showMessages ? LANG_QUEST_HELPER_MESSAGES_ON : LANG_QUEST_HELPER_MESSAGES_OFF);
+        return true;
+    }
+
+    static bool HandleQuestHelperListCommand(ChatHandler* handler)
+    {
+        int32 realmId = static_cast<int32>(realm.Id.Realm);
+        auto entries = sQuestHelperMgr->GetQuestEntriesForRealm(realmId);
+
+        if (entries.empty())
+        {
+            handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_LIST_EMPTY, realmId);
+            return true;
+        }
+
+        // Group by zone name (alphabetically ordered)
+        std::map<std::string, std::vector<std::pair<uint32, uint8>>> byZone;
+        LocaleConstant locale = sWorld->GetDefaultDbcLocale();
+
+        for (auto const& [questId, entry] : entries)
+        {
+            Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
+            std::string zone;
+
+            if (quest && quest->GetZoneOrSort() > 0)
+            {
+                if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(uint32(quest->GetZoneOrSort())))
+                {
+                    char const* name = area->area_name[locale];
+                    if (!name || !*name)
+                        name = area->area_name[LOCALE_enUS];
+                    if (name && *name)
+                        zone = name;
+                }
+            }
+            if (zone.empty())
+                zone = "General";
+
+            byZone[zone].emplace_back(questId, entry.flag & QUEST_AUTO_FLAG_BEHAVIOR_MASK);
+        }
+
+        handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_LIST_HEADER,
+            uint32(entries.size()), realmId);
+
+        for (auto& [zone, quests] : byZone)
+        {
+            std::sort(quests.begin(), quests.end());
+            handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_LIST_ZONE, zone);
+            for (auto const& [questId, flag] : quests)
+            {
+                Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
+                handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_LIST_QUEST,
+                    questId, quest ? quest->GetTitle() : "Unknown", uint32(flag));
+            }
+        }
+
         return true;
     }
 
