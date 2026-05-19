@@ -72,14 +72,16 @@ in-game quest log.
 
 | Command | Description |
 |---------|-------------|
-| `.qh help` | Toggle Quest Helper notifications on/off |
-| `.qh help on` | Enable Quest Helper notifications |
-| `.qh help off` | Disable Quest Helper notifications |
+| `.qh check <quest>` | Run Quest Helper checks on demand for a quest you have active: applies auto-completion or reward if flagged, shows any GM notes, and reports no known issues otherwise. Useful when a quest was flagged after you already accepted it. |
+| `.qh messages` | Toggle Quest Helper notifications on/off |
+| `.qh messages on` | Enable Quest Helper notifications |
+| `.qh messages off` | Disable Quest Helper notifications |
 
 ### GM commands (SEC_MODERATOR+)
 
 | Command | Description |
 |---------|-------------|
+| `.qh list` | List all auto-complete quests registered on the current realm, grouped by zone. |
 | `.qh info <quest> [realmId]` | Show the Quest Helper status for a quest: flag, temporary indicator, reason, and active notes. `realmId` defaults to the current realm. |
 | `.qh add <quest> <flag> [realmId] [reason]` | Register a quest for auto-completion permanently. `flag`: `1` = complete, `2` = complete and reward. `realmId` defaults to the current realm; use `-1` for all realms. If the quest is already registered with a different flag, the flag is updated in place. |
 | `.qh addtemp <quest> <flag> [realmId] [reason]` | Same as `.qh add` but the entry is automatically deleted on the next server restart. |
