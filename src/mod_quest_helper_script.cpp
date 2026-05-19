@@ -100,7 +100,7 @@ public:
 
     void OnAfterConfigLoad(bool reload) override
     {
-        sQuestHelperMgr->LoadConfig();
+        sQuestHelperMgr->LoadConfig(realm.Id.Realm);
         if (!reload)
         {
             sQuestHelperMgr->PurgeUntilRestartFlags();

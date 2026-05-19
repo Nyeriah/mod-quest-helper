@@ -78,7 +78,7 @@ class QuestHelperMgr
 public:
     static QuestHelperMgr* instance();
 
-    void LoadConfig();
+    void LoadConfig(uint32 realmId);
     void LoadAutoCompleteQuests();
     // Deletes all until_restart entries from the DB. Called once at startup before loading.
     void PurgeUntilRestartFlags();
@@ -109,8 +109,14 @@ private:
         return (static_cast<uint64>(realmId) << 32) | static_cast<uint64>(questId);
     }
 
-    bool _enabled = false;
-    bool _welcomeMessageEnabled = false;
+    uint32 ResolveRealm(int32 realmId) const
+    {
+        return realmId < 0 ? _realmId : static_cast<uint32>(realmId);
+    }
+
+    bool   _enabled = false;
+    bool   _welcomeMessageEnabled = false;
+    uint32 _realmId = 0;
     std::unordered_map<uint64, QuestEntry>                 _autoCompleteQuests;
     std::unordered_map<uint64, std::vector<QuestComment>>  _questComments;
     std::unordered_map<uint32, uint64>                     _commentIdIndex;

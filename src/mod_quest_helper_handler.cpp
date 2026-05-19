@@ -7,14 +7,7 @@
 #include "DatabaseEnv.h"
 #include "Log.h"
 #include "QueryResult.h"
-#include "Realm.h"
 #include <algorithm>
-
-// Resolve -1 (any negative value) to the current realm, matching RBAC convention.
-static uint32 ResolveRealm(int32 realmId)
-{
-    return realmId < 0 ? realm.Id.Realm : static_cast<uint32>(realmId);
-}
 
 QuestHelperMgr* QuestHelperMgr::instance()
 {
@@ -22,8 +15,9 @@ QuestHelperMgr* QuestHelperMgr::instance()
     return &instance;
 }
 
-void QuestHelperMgr::LoadConfig()
+void QuestHelperMgr::LoadConfig(uint32 realmId)
 {
+    _realmId               = realmId;
     _enabled               = sConfigMgr->GetOption<bool>("QuestHelper.Enable", false);
     _welcomeMessageEnabled = sConfigMgr->GetOption<bool>("QuestHelper.WelcomeMessage.Enable", true);
 }
