@@ -40,6 +40,8 @@ enum QuestHelperStrings : uint32
     LANG_QUEST_HELPER_CMD_QUEST_ADDED_TEMP      = 22,
     LANG_QUEST_HELPER_CMD_QUEST_ALREADY_REGISTERED = 23,
     LANG_QUEST_HELPER_CMD_QUEST_FLAG_UPDATED       = 24,
+    // .qh check output
+    LANG_QUEST_HELPER_CHECK_NO_ISSUES              = 25,
 };
 
 enum QuestHelperSettingIndex : uint8

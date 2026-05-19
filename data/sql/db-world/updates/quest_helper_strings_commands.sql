@@ -39,7 +39,9 @@ INSERT INTO `module_string` (`module`, `id`, `string`) VALUES
 -- .qh info: reason line
 ('mod-quest-helper', 21, '  Reason: {}'),
 -- .qh addtemp: GM confirmation
-('mod-quest-helper', 22, 'Quest {} ("{}", flag {}) added for realm {} (expires on next restart).');
+('mod-quest-helper', 22, 'Quest {} ("{}", flag {}) added for realm {} (expires on next restart).'),
+-- .qh check: no known issues
+('mod-quest-helper', 25, '|cff4CFF00Quest "{}" has no known issues on this realm.|r');
 
 INSERT INTO `module_string_locale` (`module`, `id`, `locale`, `string`) VALUES
 -- koKR
@@ -249,7 +251,22 @@ INSERT INTO `module_string_locale` (`module`, `id`, `locale`, `string`) VALUES
 ('mod-quest-helper', 19, 'ruRU', '|cff4CFF00Задание {} ("{}") отмечено для авто-выполнения с наградой на реалме {}.|r'),
 ('mod-quest-helper', 20, 'ruRU', '|cffFF8C00  Этот флаг временный и будет удалён при следующем перезапуске.|r'),
 ('mod-quest-helper', 21, 'ruRU', '  Причина: {}'),
-('mod-quest-helper', 22, 'ruRU', 'Задание {} ("{}", флаг {}) добавлено для реалма {} (истекает при следующем перезапуске).');
+('mod-quest-helper', 22, 'ruRU', 'Задание {} ("{}", флаг {}) добавлено для реалма {} (истекает при следующем перезапуске).'),
+-- ruRU — string 25
+('mod-quest-helper', 25, 'ruRU', '|cff4CFF00Задание "{}" не имеет известных проблем на этом реалме.|r');
+
+-- ============================================================
+-- String 25 locales (.qh check: no known issues)
+-- ============================================================
+
+INSERT INTO `module_string_locale` (`module`, `id`, `locale`, `string`) VALUES
+('mod-quest-helper', 25, 'koKR', '|cff4CFF00퀘스트 "{}"는 이 렐름에 알려진 문제가 없습니다.|r'),
+('mod-quest-helper', 25, 'frFR', '|cff4CFF00La quête "{}" n''a aucun problème connu sur ce royaume.|r'),
+('mod-quest-helper', 25, 'deDE', '|cff4CFF00Die Quest "{}" hat auf diesem Realm keine bekannten Probleme.|r'),
+('mod-quest-helper', 25, 'zhCN', '|cff4CFF00任务"{}"在此领域没有已知问题。|r'),
+('mod-quest-helper', 25, 'zhTW', '|cff4CFF00任務「{}」在此領域沒有已知問題。|r'),
+('mod-quest-helper', 25, 'esES', '|cff4CFF00La misión "{}" no tiene problemas conocidos en este reino.|r'),
+('mod-quest-helper', 25, 'esMX', '|cff4CFF00La misión "{}" no tiene problemas conocidos en este reino.|r');
 
 -- ============================================================
 -- Command table
@@ -257,6 +274,7 @@ INSERT INTO `module_string_locale` (`module`, `id`, `locale`, `string`) VALUES
 
 DELETE FROM `command` WHERE `name` IN (
     'qh',
+    'qh check',
     'qh messages',
     'qh info',
     'qh add',
@@ -271,6 +289,7 @@ DELETE FROM `command` WHERE `name` IN (
 
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
 ('qh',                0, 'Syntax: .qh $subcommand\n\nQuest Helper module commands. Use .qh messages to toggle notifications.'),
+('qh check',          0, 'Syntax: .qh check $quest\n\nRuns Quest Helper checks for a quest: applies auto-completion or reward if the quest is flagged, shows any GM notes, and reports no known issues otherwise. $quest accepts a quest ID or shift-clicked quest link.'),
 ('qh messages',       0, 'Syntax: .qh messages [on|off]\n\nToggles Quest Helper notifications on or off. If no argument is given the state is toggled.'),
 ('qh info',           1, 'Syntax: .qh info $quest [$realmId]\n\nShows the Quest Helper status for a quest: auto-complete flag, whether it is temporary, reason, and any active notes. $quest accepts a quest ID or shift-clicked quest link. realmId defaults to the current realm; use -1 for all realms.'),
 ('qh add',            1, 'Syntax: .qh add $quest $flag [$realmId] [$reason]\n\nRegisters a quest for auto-completion. $quest accepts a quest ID or shift-clicked quest link. Flag: 1 = complete only, 2 = complete and reward. realmId defaults to the current realm; use -1 for all realms. If the quest is already registered with a different flag, the flag is updated.'),

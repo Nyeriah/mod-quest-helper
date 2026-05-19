@@ -12,6 +12,26 @@
 
 using namespace Acore::ChatCommands;
 
+static void FulfillQuestObjectives(Player* player, Quest const* quest)
+{
+    uint16 slot = player->FindQuestSlot(quest->GetQuestId());
+    if (slot < MAX_QUEST_LOG_SIZE)
+        for (uint8 i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
+            if (quest->RequiredNpcOrGoCount[i])
+                player->SetQuestSlotCounter(slot, i, quest->RequiredNpcOrGoCount[i]);
+
+    for (uint8 i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
+    {
+        uint32 itemId = quest->RequiredItemId[i];
+        if (!itemId)
+            continue;
+        uint32 needed = quest->RequiredItemCount[i];
+        uint32 have   = player->GetItemCount(itemId, true);
+        if (have < needed)
+            player->AddItem(itemId, needed - have);
+    }
+}
+
 class quest_helper_commandscript : public CommandScript
 {
 public:
@@ -27,6 +47,7 @@ public:
         };
         static ChatCommandTable qhTable =
         {
+            { "check",    HandleQuestHelperCheckCommand,    SEC_PLAYER,    Console::No  },
             { "messages", HandleQuestHelperMessagesCommand, SEC_PLAYER,    Console::No  },
             { "info",    HandleQuestHelperInfoCommand,    SEC_MODERATOR, Console::Yes },
             { "add",     HandleQuestHelperAddCommand,     SEC_MODERATOR, Console::Yes },
@@ -40,6 +61,45 @@ public:
             { "qh", qhTable },
         };
         return commandTable;
+    }
+
+    static bool HandleQuestHelperCheckCommand(ChatHandler* handler, Quest const* quest)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+        uint32 questId = quest->GetQuestId();
+        int32  realmId = static_cast<int32>(realm.Id.Realm);
+
+        bool isAutoRewarded              = sQuestHelperMgr->IsAutoRewarded(questId, realmId);
+        bool isAutoComplete              = sQuestHelperMgr->IsAutoComplete(questId, realmId);
+        std::vector<std::string> comments = sQuestHelperMgr->GetEnabledComments(questId, realmId);
+
+        if (isAutoRewarded)
+        {
+            handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_AUTO_COMPLETE_REWARD, quest->GetTitle());
+            if (player->GetQuestStatus(questId) == QUEST_STATUS_INCOMPLETE)
+            {
+                FulfillQuestObjectives(player, quest);
+                player->CompleteQuest(questId);
+                player->RewardQuest(quest, 0, nullptr, false);
+            }
+        }
+        else if (isAutoComplete)
+        {
+            handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_AUTO_COMPLETE, quest->GetTitle());
+            if (player->GetQuestStatus(questId) == QUEST_STATUS_INCOMPLETE)
+            {
+                FulfillQuestObjectives(player, quest);
+                player->CompleteQuest(questId);
+            }
+        }
+
+        for (std::string const& comment : comments)
+            handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_COMMENT, comment);
+
+        if (!isAutoRewarded && !isAutoComplete && comments.empty())
+            handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_CHECK_NO_ISSUES, quest->GetTitle());
+
+        return true;
     }
 
     static bool HandleQuestHelperMessagesCommand(ChatHandler* handler, Optional<bool> enable)
