@@ -78,7 +78,7 @@ INSERT INTO `module_string_locale` (`module`, `id`, `locale`, `string`) VALUES
 ('mod-quest-helper',  7, 'frFR', 'Indicateur invalide. Utilisez 1 (complétion auto) ou 2 (complétion auto et récompense).'),
 ('mod-quest-helper',  9, 'frFR', 'La quête {} ("{}") n''est pas enregistrée pour le royaume {}.'),
 ('mod-quest-helper', 23, 'frFR', 'La quête {} ("{}") est déjà enregistrée sur le royaume {} avec l''indicateur {}. Aucune modification.'),
-('mod-quest-helper', 24, 'frFR', 'Quête {} ("{}") sur le royaume {} : indicateur mis à jour de {} à {}.');
+('mod-quest-helper', 24, 'frFR', 'Quête {} ("{}") sur le royaume {} : indicateur mis à jour de {} à {}.'),
 ('mod-quest-helper', 13, 'frFR', 'ID de commentaire {} introuvable.'),
 -- deDE
 ('mod-quest-helper', 16, 'deDE', 'Quest-Helfer-Daten neu geladen.'),
@@ -97,7 +97,7 @@ INSERT INTO `module_string_locale` (`module`, `id`, `locale`, `string`) VALUES
 ('mod-quest-helper',  7, 'deDE', 'Ungültiges Flag. Verwende 1 (Auto-Abschluss) oder 2 (Auto-Abschluss und Belohnung).'),
 ('mod-quest-helper',  9, 'deDE', 'Quest {} ("{}") ist für Realm {} nicht registriert.'),
 ('mod-quest-helper', 23, 'deDE', 'Quest {} ("{}") ist bereits auf Realm {} mit Flag {} registriert. Keine Änderungen.'),
-('mod-quest-helper', 24, 'deDE', 'Quest {} ("{}") auf Realm {}: Flag von {} auf {} aktualisiert.');
+('mod-quest-helper', 24, 'deDE', 'Quest {} ("{}") auf Realm {}: Flag von {} auf {} aktualisiert.'),
 ('mod-quest-helper', 13, 'deDE', 'Kommentar-ID {} nicht gefunden.'),
 -- zhCN
 ('mod-quest-helper', 16, 'zhCN', '任务助手数据已重新加载。'),
@@ -116,7 +116,7 @@ INSERT INTO `module_string_locale` (`module`, `id`, `locale`, `string`) VALUES
 ('mod-quest-helper',  7, 'zhCN', '无效的标志。请使用 1（自动完成）或 2（自动完成并发放奖励）。'),
 ('mod-quest-helper',  9, 'zhCN', '任务 {} ("{}") 未在领域 {} 中注册。'),
 ('mod-quest-helper', 23, 'zhCN', '任务 {} ("{}") 已在领域 {} 上以标志 {} 注册。无更改。'),
-('mod-quest-helper', 24, 'zhCN', '任务 {} ("{}") 在领域 {} 上：标志从 {} 更新为 {}。');
+('mod-quest-helper', 24, 'zhCN', '任务 {} ("{}") 在领域 {} 上：标志从 {} 更新为 {}。'),
 ('mod-quest-helper', 13, 'zhCN', '找不到备注 ID {}。'),
 -- zhTW
 ('mod-quest-helper', 16, 'zhTW', '任務助手資料已重新載入。'),
@@ -135,7 +135,7 @@ INSERT INTO `module_string_locale` (`module`, `id`, `locale`, `string`) VALUES
 ('mod-quest-helper',  7, 'zhTW', '無效的旗標。請使用 1（自動完成）或 2（自動完成並發放獎勵）。'),
 ('mod-quest-helper',  9, 'zhTW', '任務 {} ("{}") 未在領域 {} 中註冊。'),
 ('mod-quest-helper', 23, 'zhTW', '任務 {} ("{}") 已在領域 {} 上以旗標 {} 註冊。無更改。'),
-('mod-quest-helper', 24, 'zhTW', '任務 {} ("{}") 在領域 {} 上：旗標從 {} 更新為 {}。');
+('mod-quest-helper', 24, 'zhTW', '任務 {} ("{}") 在領域 {} 上：旗標從 {} 更新為 {}。'),
 ('mod-quest-helper', 13, 'zhTW', '找不到備註 ID {}。'),
 -- esES
 ('mod-quest-helper', 16, 'esES', 'Datos del Asistente de Misiones recargados.'),
@@ -154,7 +154,7 @@ INSERT INTO `module_string_locale` (`module`, `id`, `locale`, `string`) VALUES
 ('mod-quest-helper',  7, 'esES', 'Indicador inválido. Usa 1 (auto-completar) o 2 (auto-completar y recompensar).'),
 ('mod-quest-helper',  9, 'esES', 'La misión {} ("{}") no está registrada para el reino {}.'),
 ('mod-quest-helper', 23, 'esES', 'La misión {} ("{}") ya está registrada en el reino {} con el indicador {}. Sin cambios.'),
-('mod-quest-helper', 24, 'esES', 'Misión {} ("{}") en el reino {}: indicador actualizado de {} a {}.');
+('mod-quest-helper', 24, 'esES', 'Misión {} ("{}") en el reino {}: indicador actualizado de {} a {}.'),
 ('mod-quest-helper', 13, 'esES', 'No se encontró el ID de comentario {}.'),
 -- esMX
 ('mod-quest-helper', 16, 'esMX', 'Datos del Asistente de Misiones recargados.'),
@@ -173,7 +173,7 @@ INSERT INTO `module_string_locale` (`module`, `id`, `locale`, `string`) VALUES
 ('mod-quest-helper',  7, 'esMX', 'Indicador inválido. Usa 1 (auto-completar) o 2 (auto-completar y recompensar).'),
 ('mod-quest-helper',  9, 'esMX', 'La misión {} ("{}") no está registrada para el reino {}.'),
 ('mod-quest-helper', 23, 'esMX', 'La misión {} ("{}") ya está registrada en el reino {} con el indicador {}. Sin cambios.'),
-('mod-quest-helper', 24, 'esMX', 'Misión {} ("{}") en el reino {}: indicador actualizado de {} a {}.');
+('mod-quest-helper', 24, 'esMX', 'Misión {} ("{}") en el reino {}: indicador actualizado de {} a {}.'),
 ('mod-quest-helper', 13, 'esMX', 'No se encontró el ID de comentario {}.'),
 -- ruRU
 ('mod-quest-helper', 16, 'ruRU', 'Данные помощника заданий перезагружены.'),
@@ -192,7 +192,7 @@ INSERT INTO `module_string_locale` (`module`, `id`, `locale`, `string`) VALUES
 ('mod-quest-helper',  7, 'ruRU', 'Неверный флаг. Используйте 1 (авто-выполнение) или 2 (авто-выполнение и награда).'),
 ('mod-quest-helper',  9, 'ruRU', 'Задание {} ("{}") не зарегистрировано для реалма {}.'),
 ('mod-quest-helper', 23, 'ruRU', 'Задание {} ("{}") уже зарегистрировано на реалме {} с флагом {}. Изменений не внесено.'),
-('mod-quest-helper', 24, 'ruRU', 'Задание {} ("{}") на реалме {}: флаг обновлён с {} на {}.');
+('mod-quest-helper', 24, 'ruRU', 'Задание {} ("{}") на реалме {}: флаг обновлён с {} на {}.'),
 ('mod-quest-helper', 13, 'ruRU', 'Комментарий с ID {} не найден.'),
 -- koKR — strings 17-22
 ('mod-quest-helper', 17, 'koKR', '퀘스트 {} ("{}")은(는) 렐름 {}에 알려진 문제가 없습니다.'),
