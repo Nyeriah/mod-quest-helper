@@ -27,7 +27,7 @@ public:
         };
         static ChatCommandTable qhTable =
         {
-            { "help",    HandleQuestHelperHelpCommand,    SEC_PLAYER,    Console::No  },
+            { "messages", HandleQuestHelperMessagesCommand, SEC_PLAYER,    Console::No  },
             { "info",    HandleQuestHelperInfoCommand,    SEC_MODERATOR, Console::Yes },
             { "add",     HandleQuestHelperAddCommand,     SEC_MODERATOR, Console::Yes },
             { "addtemp", HandleQuestHelperAddTempCommand, SEC_MODERATOR, Console::Yes },
@@ -42,7 +42,7 @@ public:
         return commandTable;
     }
 
-    static bool HandleQuestHelperHelpCommand(ChatHandler* handler, Optional<bool> enable)
+    static bool HandleQuestHelperMessagesCommand(ChatHandler* handler, Optional<bool> enable)
     {
         Player* player = handler->GetSession()->GetPlayer();
         PlayerSetting setting = player->GetPlayerSetting(QUEST_HELPER_MODULE, SETTING_QH_FLAGS);
