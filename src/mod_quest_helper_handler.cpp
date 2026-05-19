@@ -7,7 +7,14 @@
 #include "DatabaseEnv.h"
 #include "Log.h"
 #include "QueryResult.h"
+#include "Realm.h"
 #include <algorithm>
+
+// Resolve -1 (any negative value) to the current realm, matching RBAC convention.
+static uint32 ResolveRealm(int32 realmId)
+{
+    return realmId < 0 ? realm.Id.Realm : static_cast<uint32>(realmId);
+}
 
 QuestHelperMgr* QuestHelperMgr::instance()
 {
@@ -55,7 +62,7 @@ void QuestHelperMgr::LoadAutoCompleteQuests()
 
         uint32 questId     = fields[0].Get<uint32>();
         uint8  flag        = fields[1].Get<uint8>();
-        uint32 realmId     = fields[2].Get<uint32>();
+        uint32 realmId     = ResolveRealm(fields[2].Get<int32>());
         std::string reason = fields[3].Get<std::string>();
 
         _autoCompleteQuests[MakeKey(questId, realmId)] = { flag, std::move(reason) };
@@ -65,9 +72,9 @@ void QuestHelperMgr::LoadAutoCompleteQuests()
     LOG_INFO("module", ">> Loaded {} auto-complete quest(s).", count);
 }
 
-void QuestHelperMgr::AddAutoCompleteQuest(uint32 questId, uint8 flag, uint32 realmId, std::string const& reason)
+void QuestHelperMgr::AddAutoCompleteQuest(uint32 questId, uint8 flag, int32 realmId, std::string const& reason)
 {
-    _autoCompleteQuests[MakeKey(questId, realmId)] = { flag, reason };
+    _autoCompleteQuests[MakeKey(questId, ResolveRealm(realmId))] = { flag, reason };
 
     std::string escapedReason = reason;
     LoginDatabase.EscapeString(escapedReason);
@@ -76,9 +83,9 @@ void QuestHelperMgr::AddAutoCompleteQuest(uint32 questId, uint8 flag, uint32 rea
         questId, uint32(flag), realmId, escapedReason);
 }
 
-bool QuestHelperMgr::RemoveAutoCompleteQuest(uint32 questId, uint32 realmId)
+bool QuestHelperMgr::RemoveAutoCompleteQuest(uint32 questId, int32 realmId)
 {
-    auto itr = _autoCompleteQuests.find(MakeKey(questId, realmId));
+    auto itr = _autoCompleteQuests.find(MakeKey(questId, ResolveRealm(realmId)));
     if (itr == _autoCompleteQuests.end())
         return false;
 
@@ -114,7 +121,7 @@ void QuestHelperMgr::LoadQuestComments()
 
         uint32 id        = fields[0].Get<uint32>();
         uint32 questId   = fields[1].Get<uint32>();
-        uint32 realmId   = fields[2].Get<uint32>();
+        uint32 realmId   = ResolveRealm(fields[2].Get<int32>());
         std::string text = fields[3].Get<std::string>();
         bool enabled     = fields[4].Get<bool>();
 
@@ -127,7 +134,7 @@ void QuestHelperMgr::LoadQuestComments()
     LOG_INFO("module", ">> Loaded {} quest comment(s).", count);
 }
 
-uint32 QuestHelperMgr::AddQuestComment(uint32 questId, uint32 realmId, std::string const& comment)
+uint32 QuestHelperMgr::AddQuestComment(uint32 questId, int32 realmId, std::string const& comment)
 {
     std::string escapedComment = comment;
     LoginDatabase.EscapeString(escapedComment);
@@ -138,7 +145,7 @@ uint32 QuestHelperMgr::AddQuestComment(uint32 questId, uint32 realmId, std::stri
     QueryResult idResult = LoginDatabase.Query("SELECT LAST_INSERT_ID()");
     uint32 newId = idResult ? idResult->Fetch()[0].Get<uint32>() : 0;
 
-    uint64 key = MakeKey(questId, realmId);
+    uint64 key = MakeKey(questId, ResolveRealm(realmId));
     _questComments[key].push_back({ newId, comment, true });
     _commentIdIndex[newId] = key;
 
@@ -184,58 +191,39 @@ bool QuestHelperMgr::HideQuestComment(uint32 commentId)
     return false;
 }
 
-std::vector<std::string> QuestHelperMgr::GetEnabledComments(uint32 questId, uint32 realmId) const
+std::vector<std::string> QuestHelperMgr::GetEnabledComments(uint32 questId, int32 realmId) const
 {
     std::vector<std::string> out;
+    auto itr = _questComments.find(MakeKey(questId, ResolveRealm(realmId)));
+    if (itr == _questComments.end())
+        return out;
 
-    auto collect = [&](uint64 key)
-    {
-        auto itr = _questComments.find(key);
-        if (itr == _questComments.end())
-            return;
-        for (QuestComment const& c : itr->second)
-            if (c.enabled)
-                out.push_back(c.text);
-    };
-
-    // Realm-specific comments first, then all-realms comments.
-    collect(MakeKey(questId, realmId));
-    if (realmId != REALM_ID_ALL)
-        collect(MakeKey(questId, REALM_ID_ALL));
+    for (QuestComment const& c : itr->second)
+        if (c.enabled)
+            out.push_back(c.text);
 
     return out;
 }
 
-QuestEntry const* QuestHelperMgr::GetQuestEntry(uint32 questId, uint32 realmId) const
+QuestEntry const* QuestHelperMgr::GetQuestEntry(uint32 questId, int32 realmId) const
 {
-    auto itr = _autoCompleteQuests.find(MakeKey(questId, realmId));
-    if (itr != _autoCompleteQuests.end())
-        return &itr->second;
-
-    // Fall back to the all-realms entry if no realm-specific entry exists.
-    if (realmId != REALM_ID_ALL)
-    {
-        itr = _autoCompleteQuests.find(MakeKey(questId, REALM_ID_ALL));
-        if (itr != _autoCompleteQuests.end())
-            return &itr->second;
-    }
-
-    return nullptr;
+    auto itr = _autoCompleteQuests.find(MakeKey(questId, ResolveRealm(realmId)));
+    return itr != _autoCompleteQuests.end() ? &itr->second : nullptr;
 }
 
-uint8 QuestHelperMgr::GetFlag(uint32 questId, uint32 realmId) const
+uint8 QuestHelperMgr::GetFlag(uint32 questId, int32 realmId) const
 {
     QuestEntry const* entry = GetQuestEntry(questId, realmId);
     return entry ? (entry->flag & QUEST_AUTO_FLAG_BEHAVIOR_MASK) : QUEST_AUTO_FLAG_NONE;
 }
 
-bool QuestHelperMgr::IsAutoComplete(uint32 questId, uint32 realmId) const
+bool QuestHelperMgr::IsAutoComplete(uint32 questId, int32 realmId) const
 {
     uint8 flag = GetFlag(questId, realmId);
     return flag == QUEST_AUTO_FLAG_COMPLETE || flag == QUEST_AUTO_FLAG_COMPLETE_REWARD;
 }
 
-bool QuestHelperMgr::IsAutoRewarded(uint32 questId, uint32 realmId) const
+bool QuestHelperMgr::IsAutoRewarded(uint32 questId, int32 realmId) const
 {
     return GetFlag(questId, realmId) == QUEST_AUTO_FLAG_COMPLETE_REWARD;
 }

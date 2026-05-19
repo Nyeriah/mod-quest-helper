@@ -57,7 +57,7 @@ public:
             return;
 
         uint32 questId = quest->GetQuestId();
-        uint32 realmId = realm.Id.Realm;
+        int32  realmId = static_cast<int32>(realm.Id.Realm);
 
         LOG_DEBUG("module.quest_helper", "QuestHelper: Player {} accepted quest {} ({})",
             player->GetName(), quest->GetTitle(), questId);

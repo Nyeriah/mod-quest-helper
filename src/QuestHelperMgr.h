@@ -10,9 +10,7 @@
 #include <unordered_map>
 #include <vector>
 
-static constexpr char     QUEST_HELPER_MODULE[] = "mod-quest-helper";
-// Sentinel realmId stored as -1 in the DB; matches every realm during lookup.
-static constexpr uint32   REALM_ID_ALL          = 0xFFFFFFFF;
+static constexpr char QUEST_HELPER_MODULE[] = "mod-quest-helper";
 
 enum QuestHelperStrings : uint32
 {
@@ -84,26 +82,26 @@ public:
     void LoadAutoCompleteQuests();
     // Deletes all until_restart entries from the DB. Called once at startup before loading.
     void PurgeUntilRestartFlags();
-    void AddAutoCompleteQuest(uint32 questId, uint8 flag, uint32 realmId, std::string const& reason = {});
-    bool RemoveAutoCompleteQuest(uint32 questId, uint32 realmId);
+    void AddAutoCompleteQuest(uint32 questId, uint8 flag, int32 realmId, std::string const& reason = {});
+    bool RemoveAutoCompleteQuest(uint32 questId, int32 realmId);
 
     void   LoadQuestComments();
-    uint32 AddQuestComment(uint32 questId, uint32 realmId, std::string const& comment);
+    uint32 AddQuestComment(uint32 questId, int32 realmId, std::string const& comment);
     bool   RemoveQuestComment(uint32 commentId);
     bool   HideQuestComment(uint32 commentId);
-    std::vector<std::string> GetEnabledComments(uint32 questId, uint32 realmId) const;
+    std::vector<std::string> GetEnabledComments(uint32 questId, int32 realmId) const;
 
     bool IsEnabled() const { return _enabled; }
     bool IsWelcomeMessageEnabled() const { return _welcomeMessageEnabled; }
 
     // Returns nullptr if the quest/realm pair has no entry.
-    QuestEntry const* GetQuestEntry(uint32 questId, uint32 realmId) const;
+    QuestEntry const* GetQuestEntry(uint32 questId, int32 realmId) const;
 
     // Returns the behavior flag (COMPLETE or COMPLETE_REWARD), stripping modifier bits.
-    uint8 GetFlag(uint32 questId, uint32 realmId) const;
+    uint8 GetFlag(uint32 questId, int32 realmId) const;
 
-    bool IsAutoComplete(uint32 questId, uint32 realmId) const;
-    bool IsAutoRewarded(uint32 questId, uint32 realmId) const;
+    bool IsAutoComplete(uint32 questId, int32 realmId) const;
+    bool IsAutoRewarded(uint32 questId, int32 realmId) const;
 
 private:
     static uint64 MakeKey(uint32 questId, uint32 realmId)
