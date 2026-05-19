@@ -26,7 +26,7 @@ INSERT INTO `module_string` (`module`, `id`, `string`) VALUES
 ('mod-quest-helper',  7, 'Invalid flag. Use 1 (auto-complete) or 2 (auto-complete and reward).'),
 ('mod-quest-helper',  9, 'Quest {} ("{}") is not registered for realm {}.'),
 ('mod-quest-helper', 23, 'Quest {} ("{}") is already registered on realm {} with flag {}. No changes made.'),
-('mod-quest-helper', 24, 'Quest {} ("{}") on realm {}: flag updated from {} to {}.');
+('mod-quest-helper', 24, 'Quest {} ("{}") on realm {}: flag updated from {} to {}.'),
 ('mod-quest-helper', 13, 'Comment ID {} not found.'),
 -- .qh info: not flagged
 ('mod-quest-helper', 17, 'Quest {} ("{}") has no known issues registered on realm {}.'),
