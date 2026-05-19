@@ -73,7 +73,7 @@ void QuestHelperMgr::AddAutoCompleteQuest(uint32 questId, uint8 flag, uint32 rea
     LoginDatabase.EscapeString(escapedReason);
     LoginDatabase.Execute(
         "REPLACE INTO `quest_completer_quests` (`questId`, `flag`, `realmId`, `reason`) VALUES ({}, {}, {}, '{}')",
-        questId, uint32(flag), realmId, escapedReason);
+        questId, uint32(flag), static_cast<int32>(realmId), escapedReason);
 }
 
 bool QuestHelperMgr::RemoveAutoCompleteQuest(uint32 questId, uint32 realmId)
@@ -85,7 +85,7 @@ bool QuestHelperMgr::RemoveAutoCompleteQuest(uint32 questId, uint32 realmId)
     _autoCompleteQuests.erase(itr);
     LoginDatabase.Execute(
         "DELETE FROM `quest_completer_quests` WHERE `questId` = {} AND `realmId` = {}",
-        questId, realmId);
+        questId, static_cast<int32>(realmId));
     return true;
 }
 
@@ -133,7 +133,7 @@ uint32 QuestHelperMgr::AddQuestComment(uint32 questId, uint32 realmId, std::stri
     LoginDatabase.EscapeString(escapedComment);
     LoginDatabase.DirectExecute(
         "INSERT INTO `quest_helper_comments` (`questId`, `realmId`, `comment`, `enabled`) VALUES ({}, {}, '{}', 1)",
-        questId, realmId, escapedComment);
+        questId, static_cast<int32>(realmId), escapedComment);
 
     QueryResult idResult = LoginDatabase.Query("SELECT LAST_INSERT_ID()");
     uint32 newId = idResult ? idResult->Fetch()[0].Get<uint32>() : 0;
