@@ -45,7 +45,7 @@ INSERT INTO `module_string` (`module`, `id`, `string`) VALUES
 -- .qh list output
 ('mod-quest-helper', 26, 'Quest Helper: {} quest(s) on realm {}:'),
 ('mod-quest-helper', 27, '  [{}]'),
-('mod-quest-helper', 28, '    #{} "{}" [flag {}]'),
+('mod-quest-helper', 28, '    #{} "{}" [{}]'),
 ('mod-quest-helper', 29, 'No auto-complete quests on realm {}.');
 
 INSERT INTO `module_string_locale` (`module`, `id`, `locale`, `string`) VALUES

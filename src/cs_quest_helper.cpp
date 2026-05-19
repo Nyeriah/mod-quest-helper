@@ -174,8 +174,9 @@ public:
             for (auto const& [questId, flag] : quests)
             {
                 Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
+                char const* flagLabel = (flag == QUEST_AUTO_FLAG_COMPLETE_REWARD) ? "complete + reward" : "complete";
                 handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_LIST_QUEST,
-                    questId, quest ? quest->GetTitle() : "Unknown", uint32(flag));
+                    questId, quest ? quest->GetTitle() : "Unknown", flagLabel);
             }
         }
 
