@@ -55,7 +55,7 @@ void QuestHelperMgr::LoadAutoCompleteQuests()
 
         uint32 questId     = fields[0].Get<uint32>();
         uint8  flag        = fields[1].Get<uint8>();
-        uint32 realmId     = static_cast<uint32>(fields[2].Get<int32>());
+        uint32 realmId     = fields[2].Get<uint32>();
         std::string reason = fields[3].Get<std::string>();
 
         _autoCompleteQuests[MakeKey(questId, realmId)] = { flag, std::move(reason) };
@@ -73,7 +73,7 @@ void QuestHelperMgr::AddAutoCompleteQuest(uint32 questId, uint8 flag, uint32 rea
     LoginDatabase.EscapeString(escapedReason);
     LoginDatabase.Execute(
         "REPLACE INTO `quest_completer_quests` (`questId`, `flag`, `realmId`, `reason`) VALUES ({}, {}, {}, '{}')",
-        questId, uint32(flag), static_cast<int32>(realmId), escapedReason);
+        questId, uint32(flag), realmId, escapedReason);
 }
 
 bool QuestHelperMgr::RemoveAutoCompleteQuest(uint32 questId, uint32 realmId)
@@ -85,7 +85,7 @@ bool QuestHelperMgr::RemoveAutoCompleteQuest(uint32 questId, uint32 realmId)
     _autoCompleteQuests.erase(itr);
     LoginDatabase.Execute(
         "DELETE FROM `quest_completer_quests` WHERE `questId` = {} AND `realmId` = {}",
-        questId, static_cast<int32>(realmId));
+        questId, realmId);
     return true;
 }
 
@@ -114,7 +114,7 @@ void QuestHelperMgr::LoadQuestComments()
 
         uint32 id        = fields[0].Get<uint32>();
         uint32 questId   = fields[1].Get<uint32>();
-        uint32 realmId   = static_cast<uint32>(fields[2].Get<int32>());
+        uint32 realmId   = fields[2].Get<uint32>();
         std::string text = fields[3].Get<std::string>();
         bool enabled     = fields[4].Get<bool>();
 
@@ -133,7 +133,7 @@ uint32 QuestHelperMgr::AddQuestComment(uint32 questId, uint32 realmId, std::stri
     LoginDatabase.EscapeString(escapedComment);
     LoginDatabase.DirectExecute(
         "INSERT INTO `quest_helper_comments` (`questId`, `realmId`, `comment`, `enabled`) VALUES ({}, {}, '{}', 1)",
-        questId, static_cast<int32>(realmId), escapedComment);
+        questId, realmId, escapedComment);
 
     QueryResult idResult = LoginDatabase.Query("SELECT LAST_INSERT_ID()");
     uint32 newId = idResult ? idResult->Fetch()[0].Get<uint32>() : 0;
