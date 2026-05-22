@@ -161,7 +161,7 @@ public:
             if (zone.empty())
                 zone = "General";
 
-            byZone[zone].emplace_back(questId, entry.flag & QUEST_AUTO_FLAG_BEHAVIOR_MASK);
+            byZone[zone].emplace_back(questId, entry.flag);
         }
 
         handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_LIST_HEADER,
@@ -174,7 +174,10 @@ public:
             for (auto const& [questId, flag] : quests)
             {
                 Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
-                char const* flagLabel = (flag == QUEST_AUTO_FLAG_COMPLETE_REWARD) ? "complete + reward" : "complete";
+                uint8 behavior = flag & QUEST_AUTO_FLAG_BEHAVIOR_MASK;
+                std::string flagLabel = (behavior == QUEST_AUTO_FLAG_COMPLETE_REWARD) ? "complete + reward" : "complete";
+                if (flag & QUEST_AUTO_FLAG_UNTIL_RESTART)
+                    flagLabel += ", temp";
                 handler->PSendModuleSysMessage(QUEST_HELPER_MODULE, LANG_QUEST_HELPER_LIST_QUEST,
                     questId, quest ? quest->GetTitle() : "Unknown", flagLabel);
             }
