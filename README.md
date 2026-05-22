@@ -81,7 +81,7 @@ in-game quest log.
 
 | Command | Description |
 |---------|-------------|
-| `.qh list` | List all auto-complete quests registered on the current realm, grouped by zone. |
+| `.qh list` | List all auto-complete quests registered on the current realm, grouped by zone. Each entry shows its flag (`complete` or `complete + reward`) and a `temp` marker if it was added via `.qh addtemp`. |
 | `.qh info <quest> [realmId]` | Show the Quest Helper status for a quest: flag, temporary indicator, reason, and active notes. `realmId` defaults to the current realm. |
 | `.qh add <quest> <flag> [realmId] [reason]` | Register a quest for auto-completion permanently. `flag`: `1` = complete, `2` = complete and reward. `realmId` defaults to the current realm; use `-1` for all realms. If the quest is already registered with a different flag, the flag is updated in place. |
 | `.qh addtemp <quest> <flag> [realmId] [reason]` | Same as `.qh add` but the entry is automatically deleted on the next server restart. |
